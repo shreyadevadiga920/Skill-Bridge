@@ -726,6 +726,11 @@ function App() {
                 </div>
 
                 <div>
+                  <strong>Target Role</strong>
+                  <span>Full Stack Developer</span>
+                </div>
+
+                <div>
                   <strong>Experience</strong>
                   <span>Fresher</span>
                 </div>
