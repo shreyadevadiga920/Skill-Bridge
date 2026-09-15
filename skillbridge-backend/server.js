@@ -9,6 +9,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Home
 app.get("/", (req, res) => {
@@ -66,6 +67,7 @@ app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    
     const result = await pool.query(
       "SELECT * FROM users WHERE email = $1",
       [email]
