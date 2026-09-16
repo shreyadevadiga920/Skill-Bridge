@@ -1,7 +1,11 @@
-import { useState } from "react";
+ import { useState } from "react";
 import "./App.css";
 
 const API_URL = "http://localhost:5000";
+
+/* =========================
+   SKILLS
+========================= */
 
 const skills = [
   { name: "HTML & CSS", progress: 90 },
@@ -14,12 +18,47 @@ const skills = [
   { name: "DSA", progress: 45 },
 ];
 
+/* =========================
+   LEARNING LINKS
+========================= */
+
+const learningLinks = {
+  "HTML & CSS":
+    "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content",
+
+  JavaScript:
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide",
+
+  "React.js":
+    "https://react.dev/learn",
+
+  "Node.js & Express.js":
+    "https://nodejs.org/en/learn",
+
+  PostgreSQL:
+    "https://www.postgresql.org/docs/",
+
+  "DSA & Interview Preparation":
+    "https://www.geeksforgeeks.org/dsa/dsa-tutorial/",
+};
+
+/* =========================
+   MAIN APP
+========================= */
+
 function App() {
-  const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem("skillbridgeUser")) || null
-  );
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("skillbridgeUser");
+
+    try {
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
+  });
 
   const [authMode, setAuthMode] = useState("login");
+
   const [page, setPage] = useState("dashboard");
 
   const [form, setForm] = useState({
@@ -30,7 +69,10 @@ function App() {
 
   const [message, setMessage] = useState("");
 
-  // Handle input
+  /* =========================
+     FORM CHANGE
+  ========================= */
+
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -38,9 +80,13 @@ function App() {
     });
   };
 
-  // Register
+  /* =========================
+     REGISTER
+  ========================= */
+
   const handleRegister = async (e) => {
     e.preventDefault();
+
     setMessage("Creating account...");
 
     try {
@@ -69,13 +115,20 @@ function App() {
 
       setAuthMode("login");
     } catch (error) {
-      setMessage("Cannot connect to backend.");
+      console.error(error);
+      setMessage(
+        "Cannot connect to backend. Make sure your backend is running."
+      );
     }
   };
 
-  // Login
+  /* =========================
+     LOGIN
+  ========================= */
+
   const handleLogin = async (e) => {
     e.preventDefault();
+
     setMessage("Logging in...");
 
     try {
@@ -97,11 +150,19 @@ function App() {
         return;
       }
 
+      /* Save login information */
+
       localStorage.setItem("skillbridgeToken", data.token);
-      localStorage.setItem("skillbridgeUser", JSON.stringify(data.user));
+
+      localStorage.setItem(
+        "skillbridgeUser",
+        JSON.stringify(data.user)
+      );
 
       setUser(data.user);
+
       setPage("dashboard");
+
       setMessage("");
 
       setForm({
@@ -110,23 +171,35 @@ function App() {
         password: "",
       });
     } catch (error) {
-      setMessage("Cannot connect to backend.");
+      console.error(error);
+
+      setMessage(
+        "Cannot connect to backend. Make sure your backend is running."
+      );
     }
   };
 
-  // Logout
+  /* =========================
+     LOGOUT
+  ========================= */
+
   const handleLogout = () => {
     localStorage.removeItem("skillbridgeToken");
+
     localStorage.removeItem("skillbridgeUser");
 
     setUser(null);
+
     setAuthMode("login");
+
     setPage("dashboard");
+
+    setMessage("");
   };
 
-  // ================================
-  // LOGIN / REGISTER
-  // ================================
+  /* =========================
+     AUTH PAGE
+  ========================= */
 
   if (!user) {
     return (
@@ -137,9 +210,12 @@ function App() {
             Skill<span>Bridge</span>
           </div>
 
+          {/* LOGIN */}
+
           {authMode === "login" ? (
             <>
               <h1>Welcome Back 👋</h1>
+
               <p className="auth-subtitle">
                 Login to continue your learning journey.
               </p>
@@ -147,6 +223,7 @@ function App() {
               <form onSubmit={handleLogin}>
 
                 <label>Email</label>
+
                 <input
                   type="email"
                   name="email"
@@ -157,6 +234,7 @@ function App() {
                 />
 
                 <label>Password</label>
+
                 <input
                   type="password"
                   name="password"
@@ -166,14 +244,19 @@ function App() {
                   required
                 />
 
-                <button className="auth-button" type="submit">
+                <button
+                  className="auth-button"
+                  type="submit"
+                >
                   Login
                 </button>
 
               </form>
 
               {message && (
-                <p className="auth-message">{message}</p>
+                <p className="auth-message">
+                  {message}
+                </p>
               )}
 
               <p className="switch-text">
@@ -181,6 +264,7 @@ function App() {
 
                 <button
                   className="link-button"
+                  type="button"
                   onClick={() => {
                     setAuthMode("register");
                     setMessage("");
@@ -191,8 +275,12 @@ function App() {
               </p>
             </>
           ) : (
+
+            /* REGISTER */
+
             <>
               <h1>Create Account</h1>
+
               <p className="auth-subtitle">
                 Start building your career with SkillBridge.
               </p>
@@ -200,6 +288,7 @@ function App() {
               <form onSubmit={handleRegister}>
 
                 <label>Full Name</label>
+
                 <input
                   type="text"
                   name="name"
@@ -210,6 +299,7 @@ function App() {
                 />
 
                 <label>Email</label>
+
                 <input
                   type="email"
                   name="email"
@@ -220,6 +310,7 @@ function App() {
                 />
 
                 <label>Password</label>
+
                 <input
                   type="password"
                   name="password"
@@ -229,14 +320,19 @@ function App() {
                   required
                 />
 
-                <button className="auth-button" type="submit">
+                <button
+                  className="auth-button"
+                  type="submit"
+                >
                   Create Account
                 </button>
 
               </form>
 
               {message && (
-                <p className="auth-message">{message}</p>
+                <p className="auth-message">
+                  {message}
+                </p>
               )}
 
               <p className="switch-text">
@@ -244,6 +340,7 @@ function App() {
 
                 <button
                   className="link-button"
+                  type="button"
                   onClick={() => {
                     setAuthMode("login");
                     setMessage("");
@@ -260,9 +357,9 @@ function App() {
     );
   }
 
-  // ================================
-  // DASHBOARD
-  // ================================
+  /* =========================
+     DASHBOARD
+  ========================= */
 
   return (
     <div className="dashboard">
@@ -278,35 +375,55 @@ function App() {
         <div className="nav">
 
           <button
-            className={page === "dashboard" ? "nav-button active" : "nav-button"}
+            className={
+              page === "dashboard"
+                ? "nav-button active"
+                : "nav-button"
+            }
             onClick={() => setPage("dashboard")}
           >
             📊 <span>Dashboard</span>
           </button>
 
           <button
-            className={page === "skills" ? "nav-button active" : "nav-button"}
+            className={
+              page === "skills"
+                ? "nav-button active"
+                : "nav-button"
+            }
             onClick={() => setPage("skills")}
           >
             🧠 <span>My Skills</span>
           </button>
 
           <button
-            className={page === "roadmap" ? "nav-button active" : "nav-button"}
+            className={
+              page === "roadmap"
+                ? "nav-button active"
+                : "nav-button"
+            }
             onClick={() => setPage("roadmap")}
           >
             🗺️ <span>Roadmap</span>
           </button>
 
           <button
-            className={page === "jobs" ? "nav-button active" : "nav-button"}
+            className={
+              page === "jobs"
+                ? "nav-button active"
+                : "nav-button"
+            }
             onClick={() => setPage("jobs")}
           >
             💼 <span>Jobs</span>
           </button>
 
           <button
-            className={page === "profile" ? "nav-button active" : "nav-button"}
+            className={
+              page === "profile"
+                ? "nav-button active"
+                : "nav-button"
+            }
             onClick={() => setPage("profile")}
           >
             👤 <span>Profile</span>
@@ -314,7 +431,10 @@ function App() {
 
         </div>
 
-        <button className="logout-button" onClick={handleLogout}>
+        <button
+          className="logout-button"
+          onClick={handleLogout}
+        >
           🚪 Logout
         </button>
 
@@ -324,32 +444,41 @@ function App() {
 
       <main className="main">
 
-        {/* TOP BAR */}
+        {/* TOPBAR */}
 
         <header className="topbar">
 
           <div>
+
             <h1>
               {page === "dashboard" && "Dashboard"}
+
               {page === "skills" && "My Skills"}
+
               {page === "roadmap" && "Learning Roadmap"}
+
               {page === "jobs" && "Jobs & Internships"}
+
               {page === "profile" && "My Profile"}
             </h1>
 
             <p>
               Build your skills. Bridge your career.
             </p>
+
           </div>
 
           <div className="user-info">
 
             <div className="user-avatar">
-              {user.name.charAt(0).toUpperCase()}
+              {user.name
+                ? user.name.charAt(0).toUpperCase()
+                : "U"}
             </div>
 
             <div>
               <strong>{user.name}</strong>
+
               <small>{user.email}</small>
             </div>
 
@@ -357,15 +486,17 @@ function App() {
 
         </header>
 
-        {/* ================================
+        {/* =========================
             DASHBOARD PAGE
-        ================================= */}
+        ========================= */}
 
         {page === "dashboard" && (
           <>
+
             <section className="hero">
 
               <div>
+
                 <h2>
                   Welcome back, {user.name}! 👋
                 </h2>
@@ -380,6 +511,7 @@ function App() {
                 >
                   View My Roadmap →
                 </button>
+
               </div>
 
               <div className="hero-icon">
@@ -393,35 +525,69 @@ function App() {
             <section className="stats">
 
               <div className="stat-card">
-                <div className="stat-icon">🎯</div>
-                <div>
-                  <h3>Full Stack Developer</h3>
-                  <p>Target Role</p>
+
+                <div className="stat-icon">
+                  🎯
                 </div>
+
+                <div>
+                  <h3>
+                    Full Stack Developer
+                  </h3>
+
+                  <p>
+                    Target Role
+                  </p>
+                </div>
+
               </div>
 
               <div className="stat-card">
-                <div className="stat-icon">📈</div>
+
+                <div className="stat-icon">
+                  📈
+                </div>
+
                 <div>
                   <h3>58%</h3>
-                  <p>Overall Progress</p>
+
+                  <p>
+                    Overall Progress
+                  </p>
                 </div>
+
               </div>
 
               <div className="stat-card">
-                <div className="stat-icon">🧠</div>
+
+                <div className="stat-icon">
+                  🧠
+                </div>
+
                 <div>
                   <h3>8</h3>
-                  <p>Skills Tracked</p>
+
+                  <p>
+                    Skills Tracked
+                  </p>
                 </div>
+
               </div>
 
               <div className="stat-card">
-                <div className="stat-icon">🔥</div>
+
+                <div className="stat-icon">
+                  🔥
+                </div>
+
                 <div>
                   <h3>7 Days</h3>
-                  <p>Learning Streak</p>
+
+                  <p>
+                    Learning Streak
+                  </p>
                 </div>
+
               </div>
 
             </section>
@@ -431,9 +597,17 @@ function App() {
             <section>
 
               <div className="section-heading">
+
                 <div>
-                  <h2>Your Skills</h2>
-                  <p>Track your technical skills.</p>
+
+                  <h2>
+                    Your Skills
+                  </h2>
+
+                  <p>
+                    Track your technical skills.
+                  </p>
+
                 </div>
 
                 <button
@@ -442,25 +616,39 @@ function App() {
                 >
                   View All
                 </button>
+
               </div>
 
               <div className="skill-grid">
 
                 {skills.slice(0, 6).map((skill) => (
-                  <div className="skill-card" key={skill.name}>
+
+                  <div
+                    className="skill-card"
+                    key={skill.name}
+                  >
 
                     <div className="skill-title">
-                      <strong>{skill.name}</strong>
-                      <span>{skill.progress}%</span>
+
+                      <strong>
+                        {skill.name}
+                      </strong>
+
+                      <span>
+                        {skill.progress}%
+                      </span>
+
                     </div>
 
                     <div className="progress-background">
+
                       <div
                         className="progress-fill"
                         style={{
                           width: `${skill.progress}%`,
                         }}
-                      ></div>
+                      />
+
                     </div>
 
                     <p>
@@ -470,19 +658,22 @@ function App() {
                     </p>
 
                   </div>
+
                 ))}
 
               </div>
 
             </section>
 
-            {/* BOTTOM */}
+            {/* BOTTOM CARDS */}
 
             <div className="bottom-grid">
 
               <div className="content-card">
 
-                <h2>⚠️ Skill Gap</h2>
+                <h2>
+                  ⚠️ Skill Gap
+                </h2>
 
                 <p className="card-subtitle">
                   Skills you should focus on next.
@@ -490,17 +681,23 @@ function App() {
 
                 <div className="gap-row">
                   <span>PostgreSQL</span>
-                  <span className="badge">Beginner</span>
+                  <span className="badge">
+                    Beginner
+                  </span>
                 </div>
 
                 <div className="gap-row">
                   <span>Express.js</span>
-                  <span className="badge">Beginner</span>
+                  <span className="badge">
+                    Beginner
+                  </span>
                 </div>
 
                 <div className="gap-row">
                   <span>Node.js</span>
-                  <span className="badge">Intermediate</span>
+                  <span className="badge">
+                    Intermediate
+                  </span>
                 </div>
 
                 <button
@@ -514,7 +711,9 @@ function App() {
 
               <div className="content-card">
 
-                <h2>🗺️ Current Roadmap</h2>
+                <h2>
+                  🗺️ Current Roadmap
+                </h2>
 
                 <p className="card-subtitle">
                   Your learning journey.
@@ -539,69 +738,104 @@ function App() {
               </div>
 
             </div>
+
           </>
         )}
 
-        {/* ================================
-            SKILLS PAGE
-        ================================= */}
+        {/* =========================
+            MY SKILLS PAGE
+        ========================= */}
 
         {page === "skills" && (
+
           <section>
 
             <div className="page-title">
-              <h2>My Skills 🧠</h2>
+
+              <h2>
+                My Skills 🧠
+              </h2>
+
               <p>
                 Track your current technical skills and improve them.
               </p>
+
             </div>
 
             <div className="skill-grid large-grid">
 
               {skills.map((skill) => (
-                <div className="skill-card large" key={skill.name}>
+
+                <div
+                  className="skill-card large"
+                  key={skill.name}
+                >
 
                   <div className="skill-title">
-                    <strong>{skill.name}</strong>
-                    <span>{skill.progress}%</span>
+
+                    <strong>
+                      {skill.name}
+                    </strong>
+
+                    <span>
+                      {skill.progress}%
+                    </span>
+
                   </div>
 
                   <div className="progress-background">
+
                     <div
                       className="progress-fill"
                       style={{
                         width: `${skill.progress}%`,
                       }}
-                    ></div>
+                    />
+
                   </div>
 
-                  <button className="update-button">
-                    Update Skill
+                  <button
+                    className="update-button"
+                    onClick={() =>
+                      openLearning(skill.name)
+                    }
+                  >
+                    Continue Learning →
                   </button>
 
                 </div>
+
               ))}
 
             </div>
 
           </section>
+
         )}
 
-        {/* ================================
-            ROADMAP
-        ================================= */}
+        {/* =========================
+            ROADMAP PAGE
+        ========================= */}
 
         {page === "roadmap" && (
+
           <section>
 
             <div className="page-title">
-              <h2>Full Stack Developer Roadmap 🗺️</h2>
+
+              <h2>
+                Full Stack Developer Roadmap 🗺️
+              </h2>
+
               <p>
                 Follow this roadmap to become job-ready.
               </p>
+
             </div>
 
             <div className="roadmap">
+
+              {/* HTML & CSS */}
 
               <RoadStep
                 number="✓"
@@ -610,12 +844,16 @@ function App() {
                 status="completed"
               />
 
+              {/* JAVASCRIPT */}
+
               <RoadStep
                 number="✓"
                 title="JavaScript"
                 description="Learn programming fundamentals, ES6 and DOM."
                 status="completed"
               />
+
+              {/* REACT */}
 
               <RoadStep
                 number="3"
@@ -624,17 +862,23 @@ function App() {
                 status="current"
               />
 
+              {/* NODE */}
+
               <RoadStep
                 number="4"
                 title="Node.js & Express.js"
                 description="Build backend applications and REST APIs."
               />
 
+              {/* POSTGRESQL */}
+
               <RoadStep
                 number="5"
                 title="PostgreSQL"
                 description="Learn SQL, database design and relationships."
               />
+
+              {/* DSA */}
 
               <RoadStep
                 number="6"
@@ -645,20 +889,27 @@ function App() {
             </div>
 
           </section>
+
         )}
 
-        {/* ================================
-            JOBS
-        ================================= */}
+        {/* =========================
+            JOBS PAGE
+        ========================= */}
 
         {page === "jobs" && (
+
           <section>
 
             <div className="page-title">
-              <h2>Jobs & Internships 💼</h2>
+
+              <h2>
+                Jobs & Internships 💼
+              </h2>
+
               <p>
                 Find opportunities that match your skills.
               </p>
+
             </div>
 
             <div className="jobs">
@@ -687,22 +938,30 @@ function App() {
             </div>
 
           </section>
+
         )}
 
-        {/* ================================
-            PROFILE
-        ================================= */}
+        {/* =========================
+            PROFILE PAGE
+        ========================= */}
 
         {page === "profile" && (
+
           <section>
 
             <div className="profile-card">
 
               <div className="profile-avatar">
-                {user.name.charAt(0).toUpperCase()}
+
+                {user.name
+                  ? user.name.charAt(0).toUpperCase()
+                  : "U"}
+
               </div>
 
-              <h2>{user.name}</h2>
+              <h2>
+                {user.name}
+              </h2>
 
               <p>
                 Computer Science & Engineering Student
@@ -722,28 +981,33 @@ function App() {
 
                 <div>
                   <strong>Target Role</strong>
-                  <span>Full Stack Developer</span>
-                </div>
-
-                <div>
-                  <strong>Target Role</strong>
-                  <span>Full Stack Developer</span>
+                  <span>
+                    Full Stack Developer
+                  </span>
                 </div>
 
                 <div>
                   <strong>Experience</strong>
-                  <span>Fresher</span>
+                  <span>
+                    Fresher
+                  </span>
                 </div>
 
               </div>
 
-              <button className="primary-button">
+              <button
+                className="primary-button"
+                onClick={() =>
+                  alert("Profile editing will be added next.")
+                }
+              >
                 Edit Profile
               </button>
 
             </div>
 
           </section>
+
         )}
 
       </main>
@@ -752,7 +1016,23 @@ function App() {
   );
 }
 
-/* Roadmap component */
+/* =========================
+   LEARNING FUNCTION
+========================= */
+
+function openLearning(title) {
+  const link = learningLinks[title];
+
+  if (link) {
+    window.open(link, "_blank");
+  } else {
+    alert(`Learning material for ${title} is coming soon.`);
+  }
+}
+
+/* =========================
+   ROADMAP COMPONENT
+========================= */
 
 function RoadStep({
   number,
@@ -769,15 +1049,21 @@ function RoadStep({
 
       <div className="step-content">
 
-        <h3>{title}</h3>
+        <h3>
+          {title}
+        </h3>
 
-        <p>{description}</p>
+        <p>
+          {description}
+        </p>
 
-        {status === "current" && (
-          <button className="continue-button">
-            Continue Learning
-          </button>
-        )}
+        <button
+          className="continue-button"
+          type="button"
+          onClick={() => openLearning(title)}
+        >
+          Continue Learning →
+        </button>
 
       </div>
 
@@ -785,7 +1071,9 @@ function RoadStep({
   );
 }
 
-/* Job component */
+/* =========================
+   JOB COMPONENT
+========================= */
 
 function Job({
   title,
@@ -797,16 +1085,28 @@ function Job({
     <div className="job-card">
 
       <div>
-        <h3>{title}</h3>
+
+        <h3>
+          {title}
+        </h3>
 
         <p>
           {company} • {location}
         </p>
 
-        <span>{skills}</span>
+        <span>
+          {skills}
+        </span>
+
       </div>
 
-      <button className="apply-button">
+      <button
+        className="apply-button"
+        type="button"
+        onClick={() =>
+          alert(`Application for ${title} will be added next.`)
+        }
+      >
         Apply
       </button>
 
